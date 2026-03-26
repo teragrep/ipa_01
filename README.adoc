@@ -41,7 +41,7 @@ See the official documentation on https://docs.teragrep.com[docs.teragrep.com].
 
 Server is limited to only Rockylinux 9.
 
-No out-of-the-box support for persistence, every container starts from scratch after restart.
+link:https://github.com/teragrep/ipa_01/issues/1[No out-of-the-box support for persistence, every container starts from scratch after restart.]
 
 Fairly little amount of graceful error handling as most errors are handled as hard failures.
 
