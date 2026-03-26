@@ -166,7 +166,7 @@ networks:
 services:
   ipa-server:
     networks:
-      ipa.example.test:
+      example.test:
         ipv4_address: 192.168.155.101
         ipv6_address: fd12:4567:789a:1::101
     # Rest of the configurations
