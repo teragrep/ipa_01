@@ -1,0 +1,10 @@
+ARG ROCKY_VERSION
+FROM rockylinux/rockylinux:${ROCKY_VERSION}
+RUN dnf install --assumeyes freeipa-client && dnf clean all
+RUN find /etc/systemd/system /usr/lib/systemd/system/{basic,multi-user,sysinit}.target.wants -type l -not -lname /dev/null -delete && systemctl mask systemd-logind.service
+COPY files/common/ipa_01.service /etc/systemd/system/ipa_01.service
+COPY files/client/ipa_01.entrypoint.sh /ipa_01.entrypoint.sh
+RUN systemctl enable ipa_01.service
+RUN mkdir -p /ipa_01.conf.d/{pre,post}/
+ENTRYPOINT ["/usr/sbin/init"]
+CMD ["--show-status=false"]

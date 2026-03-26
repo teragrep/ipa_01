@@ -1,0 +1,39 @@
+name: CI
+
+on: [ push ]
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Lowercase repository name
+        run: echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+      - name: Build images
+        run: |
+          docker build . --tag client/el8:latest -f Dockerfile.client --build-arg ROCKY_VERSION=8 &
+          docker build . --tag client/el9:latest -f Dockerfile.client --build-arg ROCKY_VERSION=9 &
+          docker build . --tag server:latest -f Dockerfile.server &
+          wait;
+
+      - name: Run container tests
+        timeout-minutes: 15
+        run:
+          cd "tests/functionality";
+          docker compose up --no-color --exit-code-from test-runner;
+          for script in pre post; do
+            for node in ipa-server ipa-client-el8 ipa-client-el9; do
+              echo "Checking if '${script}' script triggered for node '${node}'";
+              grep 'success' "${{ runner.temp }}/${node}.${script}";
+            done;
+          done;

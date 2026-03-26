@@ -1,17 +1,37 @@
-// Before publishing your new repository:
-// 1. Write the readme file
-// 2. Update the issues link in Contributing section in the readme file
-// 3. Update the discussion link in config.yml file in .github/ISSUE_TEMPLATE directory
+= FreeIPA Server & Client Containers
 
-= repo-template
-
-// Add a short description of your project. Tell what your project does and what it's used for.
-
-This is a template repository for Teragrep organization.
+Easy to use FreeIPA containers. Intended to be used with containerized tests that requires Kerberos environment.
 
 == Features
 
-// List your project's features
+Automatic installation and confguration of both FreeIPA Server and Client.
+
+Supported Server containers:
+
+[cols="1,1"]
+|===
+|Server container|Based on
+
+|`ghcr.io/teragrep/ipa_01/server:latest`
+|`rockylinux/rockylinux:9`
+|===
+
+Supported Client containers:
+
+[cols="1,1"]
+|===
+|Client container|Based on
+
+|`ghcr.io/teragrep/ipa_01/client/el8:latest`
+|`rockylinux/rockylinux:8`
+
+|`ghcr.io/teragrep/ipa_01/client/el9:latest`
+|`rockylinux/rockylinux:9`
+|===
+
+The containers can be pinned to certain releases of `:latest`, for example with `:1.0.0`. Full list of versions can be found in link:https://github.com/teragrep?tab=packages&repo_name=ipa_01[packages list].
+
+Supports running arbitrary shell scripts before and after the Server/Client installation.
 
 == Documentation
 
@@ -19,17 +39,142 @@ See the official documentation on https://docs.teragrep.com[docs.teragrep.com].
 
 == Limitations
 
-// If your project has limitations, please list them. Otherwise remove this section.
+Server is limited to only Rockylinux 9.
 
-== How to [compile/use/implement]
+No out-of-the-box support for persistence, every container starts from scratch after restart.
 
-// add instructions how people can start to use your project
+Fairly little amount of graceful error handling as most errors are handled as hard failures.
+
+== How to use
+
+See link:tests/functionality/[`tests/functionality`] for full how-to use example.
+
+---
+
+The following environment variables are used for configuring Server and Client.
+
+[cols=4]
+|===
+|Environment Variable|Used by Client|Used by Server|Notes
+
+|`IPA_01_DOMAIN`
+|Yes
+|Yes
+|Required value. The domain name, such as `example.test`
+
+|`IPA_01_ADMIN_PASSWORD`
+|Yes
+|Yes
+|Required value. The Admin password.
+
+
+|`IPA_01_SERVER_HOSTNAME`
+|Yes
+|
+|Required value. The hostname where Server can be found, for example `ipa.example.test`
+
+|`IPA_01_CLIENT_FLAGS`
+|Yes
+|
+|Optional value. Appended as-is to the `ipa-client-install` command. Defaults to `--no-ntp --force-join` if variable is not defined.
+
+|`IPA_01_MANAGER_PASSWORD`
+|
+|Yes
+|Required value. The Manager password.
+
+|`IPA_01_SERVER_FLAGS`
+|
+|Yes
+|Optional value. Appended as-is to the `ipa-server-install` command. Defaults to `--auto-reverse --setup-dns --no-forwarders --no-ntp` if variable is not defined.
+
+|===
+
+---
+
+Any executable `.sh` files placed directly under `/ipa.conf.d/pre/` and `/ipa.conf.d/post/` directories will be executed before/after `ipa-{client,server}-install` commands respectively. It is recommended to prefix the scripts with numbers to ensure expected execution order, for example naming them `01_execute_this_first.sh`, `02_this_next.sh` and `99_do_this_last.sh`.
+
+Any executed scripts must return `0` as any failures are treated as unrecoverable errors and causes the container to shut down automatically.
+
+---
+
+It is recommended to add `healthcheck` as readiness probe for the Server. The file `/ipa_01.ready` will be created once all the post-scripts has been executed by the Server so any heavy scripts have a chance to finish before letting clients start.
+
+.Example healthcheck for Server in docker-compose.yaml
+[,yaml]
+----
+services:
+  ipa-server:
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /ipa_01.ready ] && ipactl status"]
+      interval: 10s
+      retries: 54
+      start_period: 60s
+      timeout: 10s
+    # Rest of the configurations
+----
+
+It is recommended to add `depends_on` with `condition: service_healthy` for the Client(s) to prevent unnecessary container failures.
+
+.Example depends_on for Client(s) in docker-compose.yaml
+[,yaml]
+----
+services:
+  ipa-client:
+    depends_on:
+      ipa-server:
+        condition: service_healthy
+    # Rest of the configurations
+----
+
+---
+
+The containers might be required to be executed with `privileged: true` flag depending on the host configurations.
+
+.Example privileged flag in docker-compose.yaml
+[,yaml]
+----
+services:
+  ipa-client:
+    privileged: true
+    # Rest of the configurations
+----
+
+---
+
+It is recommended to use explicit network with both `ipv4` and `ipv6` in the `docker-compose.yaml` and to set ip-addresses for each of the nodes.
+
+.Example network in docker-compose.yaml
+[,yaml]
+----
+networks:
+  example.test:
+    name: example.test
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+       - subnet: 192.168.155.0/24
+         gateway: 192.168.155.1
+       - subnet: fd12:4567:789a:1::/64
+         gateway: fd12:4567:789a:1::1
+----
+
+.Example explicitly set ip addresses for clients in docker-compose.yaml
+[,yaml]
+----
+services:
+  ipa-server:
+    networks:
+      ipa.example.test:
+        ipv4_address: 192.168.155.101
+        ipv6_address: fd12:4567:789a:1::101
+    # Rest of the configurations
+----
 
 == Contributing
 
-// Change the repository name in the issues link to match with your project's name
-
-You can involve yourself with our project by https://github.com/teragrep/repo-template/issues/new/choose[opening an issue] or submitting a pull request.
+You can involve yourself with our project by https://github.com/teragrep/ipa_01/issues/new/choose[opening an issue] or submitting a pull request.
 
 Contribution requirements:
 

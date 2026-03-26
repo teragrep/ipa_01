@@ -1,0 +1,13 @@
+[Unit]
+Description=ipa_01 entrypoint
+ConditionPathExists=/ipa_01.entrypoint.sh
+
+[Service]
+Type=oneshot
+ExecStart=bash -e /ipa_01.entrypoint.sh
+StandardInput=tty
+StandardOutput=tty
+PassEnvironment=IPA_01_DOMAIN IPA_01_SERVER_HOSTNAME IPA_01_MANAGER_PASSWORD IPA_01_ADMIN_PASSWORD IPA_01_SERVER_FLAGS IPA_01_CLIENT_FLAGS
+
+[Install]
+WantedBy=multi-user.target
