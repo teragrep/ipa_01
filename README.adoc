@@ -29,7 +29,7 @@ Supported Client containers:
 |`rockylinux/rockylinux:9`
 |===
 
-The containers can be pinned to certain releases of `:latest`, for example with `:1.0.0`. Full list of versions can be found in link:https://github.com/teragrep?tab=packages&repo_name=ipa_01[packages list].
+The containers can be pinned to certain releases instead of `:latest`, for example with `:1.0.0`. Full list of versions can be found in link:https://github.com/teragrep?tab=packages&repo_name=ipa_01[packages list].
 
 Supports running arbitrary shell scripts before and after the Server/Client installation.
 
