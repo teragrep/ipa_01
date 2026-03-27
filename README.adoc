@@ -62,11 +62,10 @@ The following environment variables are used for configuring Server and Client.
 |Yes
 |Required value. The domain name, such as `example.test`
 
-|`IPA_01_ADMIN_PASSWORD`
+|`IPA_01_ENROLL_USER_PASSWORD`
 |Yes
 |Yes
-|Required value. The Admin password.
-
+|Required value. The password used by `srv-ipa_01` for enrolling the machines.
 
 |`IPA_01_SERVER_HOSTNAME`
 |Yes
@@ -77,6 +76,11 @@ The following environment variables are used for configuring Server and Client.
 |Yes
 |
 |Optional value. Appended as-is to the `ipa-client-install` command. Defaults to `--no-ntp --force-join` if variable is not defined.
+
+|`IPA_01_ADMIN_PASSWORD`
+|
+|Yes
+|Required value. The Admin password.
 
 |`IPA_01_MANAGER_PASSWORD`
 |

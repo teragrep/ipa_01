@@ -1,7 +1,7 @@
 services:
   # ipa server
   ipa-server:
-    hostname: 'ipa-server.ipa.example.test'
+    hostname: 'ipa-server.example.test'
     container_name: 'ipa-server'
     image: "server:latest"
     logging:
@@ -10,7 +10,7 @@ services:
         max-size: "10m"
         max-file: "5"
     networks:
-      ipa.example.test:
+      example.test:
         ipv4_address: 192.168.155.100
         ipv6_address: fd12:4567:789a:1::100
     privileged: true
@@ -23,7 +23,9 @@ services:
       - ./files/pre/:/ipa_01.conf.d/pre/
       - ./files/post/:/ipa_01.conf.d/post/
       - ${RUNNER_TEMP:-/tmp/ipa_01_tmp/}:/return/
-    env_file: common.env
+    env_file:
+      - common.env
+      - server.env
     healthcheck:
       test: ["CMD-SHELL", "[ -f /ipa_01.ready ] && ipactl status"]
       interval: 10s
@@ -33,7 +35,7 @@ services:
 
   # el8 based ipa client
   ipa-client-el8:
-    hostname: 'ipa-client-el8.ipa.example.test'
+    hostname: 'ipa-client-el8.example.test'
     container_name: 'ipa-client-el8'
     image: "client/el8:latest"
     logging:
@@ -42,7 +44,7 @@ services:
         max-size: "10m"
         max-file: "5"
     networks:
-      ipa.example.test:
+      example.test:
         ipv4_address: 192.168.155.101
         ipv6_address: fd12:4567:789a:1::101
     privileged: true
@@ -55,14 +57,16 @@ services:
       - ./files/pre/:/ipa_01.conf.d/pre/
       - ./files/post/:/ipa_01.conf.d/post/
       - ${RUNNER_TEMP:-/tmp/ipa_01_tmp/}:/return/
-    env_file: common.env
+    env_file:
+      - common.env
+      - client.env
     depends_on:
       ipa-server:
         condition: service_healthy
 
   # el9 based ipa client
   ipa-client-el9:
-    hostname: 'ipa-client-el9.ipa.example.test'
+    hostname: 'ipa-client-el9.example.test'
     container_name: 'ipa-client-el9'
     image: "client/el9:latest"
     logging:
@@ -71,7 +75,7 @@ services:
         max-size: "10m"
         max-file: "5"
     networks:
-      ipa.example.test:
+      example.test:
         ipv4_address: 192.168.155.102
         ipv6_address: fd12:4567:789a:1::102
     privileged: true
@@ -84,14 +88,16 @@ services:
       - ./files/pre/:/ipa_01.conf.d/pre/
       - ./files/post/:/ipa_01.conf.d/post/
       - ${RUNNER_TEMP:-/tmp/ipa_01_tmp/}:/return/
-    env_file: common.env
+    env_file:
+      - common.env
+      - client.env
     depends_on:
       ipa-server:
         condition: service_healthy
 
   # test runner that is in charge of testing the functionality and powering off the cluster.
   test-runner:
-    hostname: 'test-runner.ipa.example.test'
+    hostname: 'test-runner.example.test'
     container_name: 'test-runner'
     image: "rockylinux/rockylinux:9"
     logging:
@@ -100,7 +106,7 @@ services:
         max-size: "10m"
         max-file: "5"
     networks:
-      ipa.example.test:
+      example.test:
         ipv4_address: 192.168.155.103
         ipv6_address: fd12:4567:789a:1::103
     privileged: true
@@ -111,8 +117,8 @@ services:
     entrypoint: /usr/bin/bash /test-runner/entrypoint.sh
 
 networks:
-  ipa.example.test:
-    name: ipa.example.test
+  example.test:
+    name: example.test
     enable_ipv6: true
     ipam:
       driver: default
