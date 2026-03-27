@@ -102,7 +102,7 @@ The environment variables can be passed directly on the container startup or by 
 services:
   ipa-server:
     volumes:
-      - ./server.env:/ipa.conf.d/env/server.env
+      - ./server.env:/ipa_01.conf.d/env/server.env
     env_file:
       - common.env
     environment:
