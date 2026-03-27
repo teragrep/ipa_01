@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+# shellcheck disable=SC2329 # This is invoked via trap
 ipa_01_poweroff() {
     echo "Failure detected, powering off";
     systemctl start poweroff.target;

@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+# shellcheck disable=SC2329 # This is invoked via trap
 ipa_01_poweroff() {
     echo "Failure detected, powering off";
     systemctl start poweroff.target;
@@ -24,5 +25,7 @@ ipa-client-install --unattended --server "${IPA_01_SERVER_HOSTNAME}" --domain "$
 for file in /ipa_01.conf.d/post/*.sh; do
     [[ -x "${file}" ]] && bash "${file}";
 done;
+
+touch /ipa_01.ready;
 
 exit 0;
