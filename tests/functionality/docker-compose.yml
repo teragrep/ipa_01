@@ -23,9 +23,8 @@ services:
       - ./files/pre/:/ipa_01.conf.d/pre/
       - ./files/post/:/ipa_01.conf.d/post/
       - ${RUNNER_TEMP:-/tmp/ipa_01_tmp/}:/return/
-    env_file:
-      - common.env
-      - server.env
+      - ./server.env:/ipa.conf.d/env/server.env
+      - ./common.env:/ipa.conf.d/env/common.env
     healthcheck:
       test: ["CMD-SHELL", "[ -f /ipa_01.ready ] && ipactl status"]
       interval: 10s
@@ -57,9 +56,9 @@ services:
       - ./files/pre/:/ipa_01.conf.d/pre/
       - ./files/post/:/ipa_01.conf.d/post/
       - ${RUNNER_TEMP:-/tmp/ipa_01_tmp/}:/return/
+      - ./client.env:/ipa.conf.d/env/client.env
     env_file:
       - common.env
-      - client.env
     depends_on:
       ipa-server:
         condition: service_healthy

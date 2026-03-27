@@ -94,6 +94,22 @@ The following environment variables are used for configuring Server and Client.
 
 |===
 
+The environment variables can be passed directly on the container startup or by placing the link:https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#EnvironmentFile=[EnvironmentFile] compatible files to `/ipa_01.conf.d/env/`.
+
+.Example environment variable passing via different methods in docker-compose.yaml
+[,yaml]
+----
+services:
+  ipa-server:
+    volumes:
+      - ./server.env:/ipa.conf.d/env/server.env
+    env_file:
+      - common.env
+    environment:
+      - IPA_01_DOMAIN="example.test"
+    # Rest of the configurations
+----
+
 ---
 
 Any executable `.sh` files placed directly under `/ipa_01.conf.d/pre/` and `/ipa_01.conf.d/post/` directories will be executed before/after `ipa-{client,server}-install` commands respectively. It is recommended to prefix the scripts with numbers to ensure expected execution order, for example naming them `01_execute_this_first.sh`, `02_this_next.sh` and `99_do_this_last.sh`.

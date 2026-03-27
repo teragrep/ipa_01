@@ -5,6 +5,6 @@ RUN find /etc/systemd/system /usr/lib/systemd/system/{basic,multi-user,sysinit}.
 COPY files/common/ipa_01.service /etc/systemd/system/ipa_01.service
 COPY files/client/ipa_01.entrypoint.sh /ipa_01.entrypoint.sh
 RUN systemctl enable ipa_01.service
-RUN mkdir -p /ipa_01.conf.d/{pre,post}/
+RUN mkdir -p /ipa_01.conf.d/{pre,post,env}/
 ENTRYPOINT ["/usr/sbin/init"]
 CMD ["--show-status=false"]
