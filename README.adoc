@@ -96,6 +96,8 @@ Any executable `.sh` files placed directly under `/ipa_01.conf.d/pre/` and `/ipa
 
 Any executed scripts must return `0` as any failures are treated as unrecoverable errors and causes the container to shut down automatically.
 
+Modifying the original entrypoint *is not recommended or supported* but can be achieved by overwriting `/ipa_01.entrypoint.sh`. See link:files/client/ipa_01.entrypoint.sh[client entrypoint] and link:files/server/ipa_01.entrypoint.sh[server entrypoint] for original implementations.
+
 ---
 
 It is recommended to add `healthcheck` as readiness probe for the Server. The file `/ipa_01.ready` will be created once all the post-scripts has been executed by the Server so any heavy scripts have a chance to finish before letting clients start.
