@@ -7,7 +7,7 @@ Type=oneshot
 ExecStart=bash -e /ipa_01.entrypoint.sh
 StandardInput=tty
 StandardOutput=tty
-EnvironmentFile=-/ipa.conf.d/env/*
+EnvironmentFile=-/ipa_01.conf.d/env/*
 PassEnvironment=IPA_01_DOMAIN IPA_01_SERVER_HOSTNAME IPA_01_MANAGER_PASSWORD IPA_01_ADMIN_PASSWORD IPA_01_SERVER_FLAGS IPA_01_CLIENT_FLAGS IPA_01_ENROLL_USER_PASSWORD
 
 [Install]
